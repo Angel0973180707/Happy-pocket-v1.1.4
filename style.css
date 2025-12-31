@@ -1,0 +1,160 @@
+/* ============================================================
+   幸福教養｜零用錢練功房 v1.1.4 專業教養版 CSS
+   - 主題：溫暖前額葉橘 (#E67E22)
+   - 特色：30秒環形倒數計時器、圓潤卡片、自適應 iframe
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap');
+
+:root {
+    --primary: #e67e22;
+    --primary-light: #fff7ed;
+    --text-main: #431407;
+    --bg-gray: #fffaf5;
+}
+
+body {
+    font-family: 'Noto Sans TC', sans-serif;
+    background-color: var(--bg-gray);
+    color: var(--text-main);
+    margin: 0;
+    line-height: 1.6;
+    overflow-x: hidden;
+}
+
+/* 卡片與容器 */
+.card {
+    background: white;
+    border-radius: 28px;
+    box-shadow: 0 10px 25px rgba(230, 126, 34, 0.08);
+    border: 1px solid rgba(230, 126, 34, 0.1);
+    transition: transform 0.2s ease;
+}
+
+/* 頂部狀態列 */
+.status-bar {
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(10px);
+    border-bottom: 2px solid var(--primary-light);
+}
+
+/* 練功房 30 秒圓環倒數 */
+#timerCircle {
+    transition: stroke-dashoffset 1s linear;
+    stroke-linecap: round;
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.05); opacity: 0.8; }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+.cooldown-active #timerNum {
+    animation: pulse 1s infinite;
+}
+
+/* 按鈕系統 */
+.btn-primary {
+    background: var(--primary);
+    color: white;
+    border-radius: 18px;
+    font-weight: 700;
+    box-shadow: 0 4px 12px rgba(230, 126, 34, 0.3);
+    border: none;
+    cursor: pointer;
+}
+
+.btn-primary:active {
+    transform: scale(0.96);
+}
+
+.btn-outline {
+    border: 2px solid var(--primary);
+    color: var(--primary);
+    border-radius: 18px;
+    font-weight: 700;
+    background: transparent;
+}
+
+/* 想要/需要/不確定 選擇器 */
+.choice-btn {
+    border: 2px solid #fed7aa;
+    color: #7c2d12;
+    border-radius: 16px;
+    padding: 10px;
+    font-size: 14px;
+    font-weight: 700;
+    transition: all 0.2s;
+}
+
+.choice-btn.selected {
+    background: var(--primary);
+    color: white;
+    border-color: var(--primary);
+}
+
+/* 底部導覽列 */
+.nav-container {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(15px);
+    border-top: 1px solid #fed7aa;
+    padding-bottom: env(safe-area-inset-bottom);
+}
+
+.nav-btn {
+    color: #9a3412;
+    font-size: 11px;
+    font-weight: 700;
+    opacity: 0.6;
+}
+
+.nav-btn.tab-active {
+    color: var(--primary);
+    opacity: 1;
+}
+
+.nav-btn.tab-active .icon-bg {
+    background: var(--primary-light);
+    border-radius: 12px;
+}
+
+/* 分隔線與標籤 */
+.hr-text {
+    display: flex;
+    align-items: center;
+    color: #fed7aa;
+    font-size: 12px;
+    margin: 20px 0;
+}
+
+.hr-text::before, .hr-text::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background: #fed7aa;
+    margin: 0 10px;
+}
+
+/* 說明頁特別樣式 */
+.info-tag {
+    background: #ffedd5;
+    color: #9a3412;
+    padding: 2px 8px;
+    border-radius: 6px;
+    font-weight: 900;
+}
+
+/* Google 表單容器 */
+.form-container iframe {
+    width: 100%;
+    min-height: 80vh;
+    border-radius: 20px;
+    border: 1px solid #fed7aa;
+}
+
+/* 隱藏原生捲軸 */
+::-webkit-scrollbar {
+    width: 0px;
+    background: transparent;
+}
