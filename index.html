@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>小錢包大智慧 v1.1.4</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&display=swap');
+        body { font-family: 'Noto Sans TC', sans-serif; background-color: #FFF5E6; }
+        .card { background: white; border-radius: 24px; box-shadow: 0 8px 20px rgba(0,0,0,0.05); }
+        .btn-primary { background: #E67E22; color: white; border-radius: 16px; transition: 0.3s; }
+        .btn-primary:disabled { background: #BDC3C7; }
+        .btn-outline { border: 2px solid #E67E22; color: #E67E22; border-radius: 16px; }
+        .tab-active { color: #E67E22; border-bottom: 3px solid #E67E22; }
+        .hidden { display: none; }
+    </style>
+</head>
+<body class="pb-20">
+
+    <div class="p-4 flex justify-between items-center bg-white shadow-sm sticky top-0 z-10">
+        <div class="flex items-center gap-2">
+            <span class="text-xl">💰</span>
+            <span class="font-bold text-orange-800">撲滿：$<span id="balanceDisplay">165</span></span>
+        </div>
+        <div class="flex items-center gap-2">
+            <span class="text-xl">💎</span>
+            <span class="font-bold text-blue-600">點數：<span id="pointsDisplay">0</span> P</span>
+        </div>
+    </div>
+
+    <main class="p-4">
+        
+        <section id="page-info" class="page-content">
+            <div class="card p-6 border-l-8 border-orange-500">
+                <h2 class="text-2xl font-bold text-orange-800 mb-4">🧠 為什麼要「練功」？</h2>
+                <p class="text-gray-700 leading-relaxed mb-4">
+                    當我們看到想買的東西時，大腦裡的「情緒中心」會變得很興奮，讓我們產生**衝動**。這時候，我們需要練習使用**前額葉**（理智大腦）來踩煞車。
+                </p>
+                <div class="bg-orange-50 p-4 rounded-xl mb-4">
+                    <p class="font-bold text-orange-900">💡 零用錢的定義：</p>
+                    <p class="text-sm text-orange-800">零用錢不是禮物，而是讓你練習「管理慾望」與「做出選擇」的預算。</p>
+                </div>
+                <h3 class="font-bold mb-2">🏆 練功三部曲：</h3>
+                <ul class="text-sm space-y-2 text-gray-600">
+                    <li>1. **輸入金額**：面對你的慾望。</li>
+                    <li>2. **冷靜 30 秒**：讓前額葉醒過來，區分「想要」還是「需要」。</li>
+                    <li>3. **做出決定**：不買或考慮，都能轉換為聚寶盆點數喔！</li>
+                </ul>
+            </div>
+        </section>
+
+        <section id="page-practice" class="page-content hidden">
+            <div class="card p-8 text-center">
+                <h2 class="text-2xl font-bold mb-6">🧘 踩煞車練功中</h2>
+                
+                <div id="step-input">
+                    <p class="text-gray-500 mb-4">想買的東西多少錢？</p>
+                    <input type="number" id="itemPrice" class="w-full text-center text-3xl p-4 border-b-2 border-orange-200 focus:outline-none focus:border-orange-500 mb-8" placeholder="$">
+                    <button onclick="startCooldown()" class="w-full btn-primary py-4 text-xl font-bold">開始練功 (冷靜一下)</button>
+                </div>
+
+                <div id="step-cooldown" class="hidden">
+                    <div class="relative w-32 h-32 mx-auto mb-6">
+                        <svg class="w-full h-full" viewBox="0 0 100 100">
+                            <circle cx="50" cy="50" r="45" fill="none" stroke="#eee" stroke-width="5"/>
+                            <circle id="timerCircle" cx="50" cy="50" r="45" fill="none" stroke="#E67E22" stroke-width="5" stroke-dasharray="283" stroke-dashoffset="0" transform="rotate(-90 50 50)"/>
+                        </svg>
+                        <div id="timerNum" class="absolute inset-0 flex items-center justify-center text-3xl font-bold text-orange-600">30</div>
+                    </div>
+                    <p class="text-orange-800 font-bold mb-2">前額葉冷卻中...</p>
+                    <p class="text-sm text-gray-500">請思考：這東西是「想要」還是「需要」？</p>
+                </div>
+
+                <div id="step-decision" class="hidden">
+                    <div class="grid grid-cols-3 gap-2 mb-8">
+                        <button onclick="setMode('需要')" class="p-3 border rounded-xl focus:bg-orange-100">需要</button>
+                        <button onclick="setMode('想要')" class="p-3 border rounded-xl focus:bg-orange-100">想要</button>
+                        <button onclick="setMode('不確定')" class="p-3 border rounded-xl focus:bg-orange-100">不確定</button>
+                    </div>
+                    <button onclick="buyNow()" class="w-full btn-outline py-4 mb-4 font-bold text-lg">還是想買 (扣撲滿)</button>
+                    <button onclick="savePoints()" class="w-full btn-primary py-4 font-bold text-lg shadow-lg">我不買了！存點數</button>
+                </div>
+            </div>
+        </section>
+
+        <section id="page-settings" class="page-content hidden">
+            <div class="card p-6 mb-6">
+                <h2 class="text-xl font-bold mb-4">⚙️ 家長管理模式</h2>
+                <div class="space-y-4">
+                    <div>
+                        <label class="text-sm text-gray-500">本期零用錢 ($)</label>
+                        <input type="number" value="200" class="w-full p-3 border rounded-xl bg-gray-50">
+                    </div>
+                    <div>
+                        <label class="text-sm text-gray-500">兌換率 ($100 換幾點？)</label>
+                        <input type="number" id="rateInput" value="1" class="w-full p-3 border rounded-xl bg-gray-50">
+                    </div>
+                </div>
+            </div>
+
+            <div class="card p-6">
+                <h2 class="text-xl font-bold mb-2 text-blue-800">🎡 扭蛋池親子共創</h2>
+                <p class="text-xs text-gray-500 mb-4">獎勵孩子克制慾望，省下的錢換成點數抽驚喜！</p>
+                <div id="gachaList" class="space-y-2 mb-4">
+                    <div class="flex gap-2"><input type="text" value="多聽一個睡前故事" class="flex-1 p-2 border rounded-lg text-sm gacha-item"></div>
+                    <div class="flex gap-2"><input type="text" value="去公園騎腳踏車" class="flex-1 p-2 border rounded-lg text-sm gacha-item"></div>
+                </div>
+                <button onclick="addGachaField()" class="text-blue-600 text-sm font-bold">+ 新增獎項</button>
+            </div>
+        </section>
+
+    </main>
+
+    <nav class="fixed bottom-0 w-full bg-white border-t flex justify-around p-2 shadow-2xl">
+        <button onclick="showPage('info')" class="flex flex-col items-center p-2 nav-btn tab-active" id="nav-info">
+            <span class="text-xl">📖</span><span class="text-xs">說明</span>
+        </button>
+        <button onclick="showPage('practice')" class="flex flex-col items-center p-2 nav-btn" id="nav-practice">
+            <span class="text-xl">🧘</span><span class="text-xs">練功</span>
+        </button>
+        <button onclick="showPage('settings')" class="flex flex-col items-center p-2 nav-btn" id="nav-settings">
+            <span class="text-xl">⚙️</span><span class="text-xs">設定</span>
+        </button>
+        <button onclick="openFeedback()" class="flex flex-col items-center p-2">
+            <span class="text-xl">🎁</span><span class="text-xs">魔法箱</span>
+        </button>
+    </nav>
+
+    <script>
+        let balance = 165;
+        let points = 0;
+        let currentMode = '';
+
+        function showPage(pageId) {
+            document.querySelectorAll('.page-content').forEach(p => p.classList.add('hidden'));
+            document.getElementById('page-' + pageId).classList.remove('hidden');
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('tab-active'));
+            document.getElementById('nav-' + pageId).classList.add('tab-active');
+        }
+
+        // 練功邏輯
+        function startCooldown() {
+            const price = document.getElementById('itemPrice').value;
+            if (!price || price <= 0) return alert('請先輸入金額');
+            
+            document.getElementById('step-input').classList.add('hidden');
+            document.getElementById('step-cooldown').classList.remove('hidden');
+            
+            let count = 30;
+            const timerCircle = document.getElementById('timerCircle');
+            const timerNum = document.getElementById('timerNum');
+            
+            const interval = setInterval(() => {
+                count--;
+                timerNum.innerText = count;
+                const offset = 283 - (count / 30) * 283;
+                timerCircle.style.strokeDashoffset = offset;
+                
+                if (count <= 0) {
+                    clearInterval(interval);
+                    document.getElementById('step-cooldown').classList.add('hidden');
+                    document.getElementById('step-decision').classList.remove('hidden');
+                }
+            }, 1000);
+        }
+
+        function setMode(mode) {
+            currentMode = mode;
+            alert('已標記為：' + mode + '。請做決定！');
+        }
+
+        function buyNow() {
+            const price = parseInt(document.getElementById('itemPrice').value);
+            if (balance < price) return alert('撲滿餘額不足喔！再考慮看看？');
+            balance -= price;
+            updateDisplay();
+            alert('已購買。記得這只是預算的一部分喔！');
+            resetPractice();
+        }
+
+        function savePoints() {
+            const price = parseInt(document.getElementById('itemPrice').value);
+            const rate = parseInt(document.getElementById('rateInput').value);
+            const earnedPoints = Math.floor(price / 100) * rate;
+            
+            points += earnedPoints;
+            updateDisplay();
+            alert(`太棒了！你克制了「${currentMode}」的衝動，獲得了 ${earnedPoints} 點獎勵！`);
+            resetPractice();
+        }
+
+        function updateDisplay() {
+            document.getElementById('balanceDisplay').innerText = balance;
+            document.getElementById('pointsDisplay').innerText = points;
+        }
+
+        function resetPractice() {
+            document.getElementById('step-input').classList.remove('hidden');
+            document.getElementById('step-cooldown').classList.add('hidden');
+            document.getElementById('step-decision').classList.add('hidden');
+            document.getElementById('itemPrice').value = '';
+            showPage('info');
+        }
+
+        // 親子共創區
+        function addGachaField() {
+            const container = document.getElementById('gachaList');
+            const div = document.createElement('div');
+            div.className = 'flex gap-2';
+            div.innerHTML = '<input type="text" placeholder="輸入新獎項" class="flex-1 p-2 border rounded-lg text-sm gacha-item">';
+            container.appendChild(div);
+        }
+
+        // 魔法箱問卷
+        function openFeedback() {
+            window.open("https://forms.gle/your_google_form_id", "_blank");
+        }
+    </script>
+</body>
+</html>
